@@ -1,0 +1,102 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <TabHost
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/tabHost"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true">
+
+        <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:orientation="vertical">
+
+            <TabWidget
+                    android:id="@android:id/tabs"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content">
+            </TabWidget>
+
+            <FrameLayout
+                    android:id="@android:id/tabcontent"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent">
+
+                <LinearLayout
+                        android:id="@+id/tab1"
+                        android:layout_width="match_parent"
+                        android:layout_height="fill_parent"
+                        android:orientation="vertical"
+                        >
+
+                   <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal" >
+                        
+	                    <EditText
+	                        android:id="@+id/url"
+	                        android:layout_width="wrap_content"
+	                        android:layout_height="wrap_content"
+	                        android:layout_alignParentLeft="true"
+	                        android:layout_centerVertical="true"
+	                        android:layout_gravity="center_horizontal|top"
+	                        android:layout_toLeftOf="@+id/button_go"
+	                        android:editable="true"
+	                        android:hint="@string/url_placeholder"
+	                        android:inputType="textUri"
+	                        android:singleLine="true" />
+
+	                    <Button
+	                        android:id="@+id/button_go"
+	                        android:layout_width="wrap_content"
+	                        android:layout_height="wrap_content"
+	                        android:layout_alignParentRight="true"
+	                        android:layout_centerVertical="true"
+	                        android:text="@string/button_go" />
+
+	                    <ProgressBar
+	                        android:id="@+id/progress"
+	                        style="?android:attr/progressBarStyleSmall"
+	                        android:layout_width="wrap_content"
+	                        android:layout_height="wrap_content"
+	                        android:layout_alignParentRight="true"
+	                        android:layout_centerVertical="true"
+	                        android:layout_marginRight="7dp"
+	                        android:max="100"
+	                        android:visibility="gone" />
+                        
+                    </RelativeLayout>
+
+                    <EditText
+                        android:id="@+id/textOutput"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center_horizontal|top"
+                        android:editable="false"
+                        android:hint="@string/info_placeholder"
+                        android:singleLine="false"
+                        android:textIsSelectable="true" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                        android:id="@+id/tab2"
+                        android:layout_width="match_parent"
+                        android:layout_height="fill_parent">
+
+                    <WebView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:id="@+id/webView"/>
+                </LinearLayout>
+
+            </FrameLayout>
+        </LinearLayout>
+    </TabHost>
+</RelativeLayout>
