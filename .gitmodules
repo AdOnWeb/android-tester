@@ -1,0 +1,3 @@
+[submodule "Libraries/OpenUDID-library"]
+	path = Libraries/OpenUDID-library
+	url = git@github.com:demdxx/OpenUDID-library.git

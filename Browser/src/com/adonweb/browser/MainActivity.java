@@ -5,15 +5,20 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+import org.OpenUDID.OpenUDID_manager;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpVersion;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.odinmobile.android.ODIN;
 
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.telephony.TelephonyManager;
 import android.view.KeyEvent;
 import android.view.View;
 import android.webkit.WebView;
@@ -23,14 +28,17 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TabHost;
 import android.widget.TabHost.TabSpec;
+import android.widget.TextView;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.Bitmap;
 
 public class MainActivity extends Activity implements View.OnClickListener, View.OnKeyListener {
   
   private EditText _url;
   private EditText _output;
+  private TextView _deviceInfo;
   private WebView _webView;
   private TabHost _tabhost;
   private ProgressBar _progress;
@@ -118,11 +126,11 @@ public class MainActivity extends Activity implements View.OnClickListener, View
     
     @Override
     public void onPageFinished(WebView view, String url) {
-      
+
       if (null!=_progress) {
         _progress.setVisibility(View.GONE);
       }
-      
+
       if (null!=_go) {
         _go.setVisibility(View.VISIBLE);
         _go.setEnabled(true);
@@ -131,21 +139,27 @@ public class MainActivity extends Activity implements View.OnClickListener, View
       super.onPageFinished(view, url);
     }
     
+    /**
+     * Stream to string
+     * @param is
+     * @return
+     * @throws IOException
+     */
     private StringBuilder inputStreamToString(InputStream is) throws IOException {
       String line = "";
       StringBuilder total = new StringBuilder();
-      
+
       // Wrap a BufferedReader around the InputStream
       BufferedReader rd = new BufferedReader(new InputStreamReader(is));
 
       // Read response until the end
       while ((line = rd.readLine()) != null) { 
-          total.append(line); 
+        total.append(line); 
       }
-      
+
       // Return full string
       return total;
-  }
+    }
   };
 
   @SuppressLint("SetJavaScriptEnabled")
@@ -159,6 +173,7 @@ public class MainActivity extends Activity implements View.OnClickListener, View
     
     _output = (EditText)findViewById(R.id.textOutput);
     _progress = (ProgressBar)findViewById(R.id.progress);
+    _deviceInfo = (TextView)findViewById(R.id.deviceInfo);
     
     _go = (Button)findViewById(R.id.button_go);
     _go.setOnClickListener(this);
@@ -176,6 +191,11 @@ public class MainActivity extends Activity implements View.OnClickListener, View
     spec.setIndicator(getResources().getString(R.string.tab_webview));
     spec.setContent(R.id.tab2);
     _tabhost.addTab(spec);
+
+    spec = _tabhost.newTabSpec("TAB 3");
+    spec.setIndicator(getResources().getString(R.string.tab_device));
+    spec.setContent(R.id.tab3);
+    _tabhost.addTab(spec);
     
     // Init web view
     _webView = (WebView)findViewById(R.id.webView);
@@ -192,6 +212,7 @@ public class MainActivity extends Activity implements View.OnClickListener, View
 //        activity.setProgress(progress * 1000);
 //      }
 //    });
+    collectInfo();
   }
 
   @Override
@@ -212,4 +233,36 @@ public class MainActivity extends Activity implements View.OnClickListener, View
     return false;
   }
   
+  /**
+   * Gather information on units
+   * @return void
+   */
+  private void collectInfo() {
+    String udid = ((TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE)).getDeviceId();
+    String odin = ODIN.getODIN1(getApplicationContext());
+    String openUDID = "<invalid>";
+
+    OpenUDID_manager.sync(getApplicationContext());
+    if (OpenUDID_manager.isInitialized()) {
+      openUDID = OpenUDID_manager.getOpenUDID();
+    }
+
+    WifiManager wifiMan = (WifiManager)getSystemService(
+        Context.WIFI_SERVICE);
+    WifiInfo wifiInf = wifiMan.getConnectionInfo();
+    String macAddr = wifiInf.getMacAddress();
+    if (null == macAddr) {
+      macAddr = "Device don't have mac address or wi-fi is disabled";
+    }
+
+    int processorCount = Runtime.getRuntime().availableProcessors();
+    
+    // Format output
+    String result = String.format(
+        "UDID: %s\nUDID ODIN: %s\nOpenUDID: %s\nMac Address: %s\nProcessor Count: %d",
+        udid, odin, openUDID, macAddr, processorCount
+    );
+    
+    _deviceInfo.setText(result);
+  }
 }
